@@ -1,0 +1,63 @@
+
+
+
+
+void tarjans_scc(int u, vector<vector<int>>& adj, stack<int>& s, map<int,bool>& stackMap, vector<int>& low, vector<int>& disc) {
+
+    static int time = 0;
+    disc[u] = time;
+    low[u] = time;
+    time+=1;
+    s.push(u);
+    stackMap[u] = true;
+    for(int v : adj[u]) {
+        if(disc[v]!=-1) {
+            tarjans_scc(v,adj,s,stackMap,low,disc);
+            low[u] = min(low[u],low[v]);
+        } else {
+            if(stackMap[v]) { // back edge
+                low[u] = min(low[u],disc[v]);
+            }
+        }
+    }
+    
+    if(low[u]==disc[u]) {
+        cout<<"SCC IS : ";
+        while(s.top()!=u) {
+            cout<<s.top()<< " ";
+            stackMap[s.top()]=false;
+            s.pop();
+        }
+        cout<<s.top()<< " ";
+            stackMap[s.top()]=false;
+            s.pop();
+    }
+
+}
+
+
+// tarjans -  find scc in O(V+E)
+// we maintain a stack, which helps us figure out:
+// 1. if the already visited node that is encountered in already in the stack, its a backedge and needs to be processed ( low value updatation ).
+// to check if present in the stack, use a map - ( O(1)) lookup.
+// 2. pop till the current node from the stack if that node is the head node of a all nodes of a SCC.
+// we also maintain 2 arrays - disc and low.  disc: discovery time of a node, low: the discovery time of the node which has the lowest discovery time which is 
+// accessible from the current node.
+// if low[node] == disc[node], its a head node of a SCC.
+
+void main() {
+    
+int n;
+vector<vector<int>> adj(n+1);
+stack<int> s;
+map<int,bool> stackMap;
+vector<int> low(n+1,-1);
+vector<int> disc(n+1,-1);
+
+for(int i=0;i<n;i++) {
+    if(disc[i]==-1) {
+        tarjans_scc(0,adj,s,stackMap,low,disc); 
+    }
+}
+return 0;
+}
